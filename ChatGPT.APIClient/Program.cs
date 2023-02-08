@@ -14,22 +14,46 @@ if (args.Length > 0)
 
     string responseString = await response.Content.ReadAsStringAsync();
 
-    Console.WriteLine(responseString);
+   
 
     try
     {
+
+
         var dyData = JsonConvert.DeserializeObject<dynamic>(responseString);
 
+        string guess = GuessCommand(dyData!.choices[0].text);
+
         Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine($"---> API response is: {dyData!.choices[0].text}");
+
+        Console.WriteLine($"---> My guess at the command  promp t is: {guess}");
         Console.ResetColor();
     }
     catch(Exception ex)
     {
         Console.WriteLine($"---> could not deserialize the Json:{ex.Message}");
     }
+
+   // Console.WriteLine(responseString);
 }
 else
 {
     Console.WriteLine("---> You need to provide some input");
+}
+
+static string GuessCommand(string raw)
+{
+    Console.WriteLine("---> GPT -3 API Returned Text:");
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine(raw);
+
+    var lastIndex = raw.IndexOf("\n");
+
+    string guess = raw.Substring(lastIndex + 1);
+
+
+    Console.ResetColor();
+
+    TextCopy.ClipboardService.SetText(guess);
+    return guess;
 }
